@@ -3,8 +3,13 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { useNotifications } from "@/contexts/NotificationContext";
 import { NotificationPanel } from "@/components/ui/notification-panel";
+import { ProfileMenu } from "@/components/ui/profile-menu";
+import { useState } from "react";
 
 export const Header = () => {
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [userRole] = useState<"admin" | "manager" | "staff" | "supplier">("admin");
+  
   const { 
     unreadCount, 
     highPriorityCount, 
@@ -80,7 +85,12 @@ export const Header = () => {
             )}
           </Button>
           
-          <Button variant="ghost" size="icon">
+          <Button 
+            variant="ghost" 
+            size="icon"
+            className="hover:bg-blue-50 hover:text-blue-600 transition-all duration-200 rounded-full p-2"
+            onClick={() => setIsProfileOpen(!isProfileOpen)}
+          >
             <User className="h-5 w-5" />
           </Button>
         </div>
@@ -94,6 +104,12 @@ export const Header = () => {
         onDelete={deleteNotification}
         onMarkAllAsRead={markAllAsRead}
         onClearAll={clearAll}
+      />
+
+      <ProfileMenu
+        isOpen={isProfileOpen}
+        onClose={() => setIsProfileOpen(false)}
+        userRole={userRole}
       />
     </>
   );

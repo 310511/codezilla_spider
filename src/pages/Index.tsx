@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import { Header } from "@/components/layout/Header";
 import { StatsGrid } from "@/components/dashboard/StatsGrid";
 import { InventoryTable } from "@/components/dashboard/InventoryTable";
@@ -5,9 +6,12 @@ import { BlockchainActivity } from "@/components/dashboard/BlockchainActivity";
 import { AlertsPanel } from "@/components/dashboard/AlertsPanel";
 import InventoryNav from "@/components/inventory/InventoryNav";
 import { NotificationTest } from "@/components/ui/notification-test";
+import { RoleSwitcher } from "@/components/ui/role-switcher";
 import heroImage from "@/assets/medical-hero.jpg";
 
 const Index = () => {
+  const [currentRole, setCurrentRole] = useState<"admin" | "manager" | "staff" | "supplier">("admin");
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -68,6 +72,10 @@ const Index = () => {
               <BlockchainActivity />
               <InventoryNav />
               <NotificationTest />
+              <RoleSwitcher 
+                currentRole={currentRole} 
+                onRoleChange={setCurrentRole} 
+              />
             </div>
           </div>
         </div>

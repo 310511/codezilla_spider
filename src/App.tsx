@@ -18,6 +18,8 @@ import { MedicineRecommendationDashboard } from "@/components/medicine-recommend
 import InventoryDashboard from "@/components/inventory/InventoryDashboard";
 import { Notifications } from "@/components/ui/notifications";
 import { useBlockchain } from "@/contexts/BlockchainContext";
+import Profile from "./pages/Profile";
+import Settings from "./pages/Settings";
 
 const queryClient = new QueryClient();
 
@@ -44,6 +46,8 @@ const AppContent = () => {
         <Route path="/ml-predictions" element={<MLPredictionsDashboard />} />
         <Route path="/medicine-recommendation" element={<MedicineRecommendationDashboard />} />
         <Route path="/inventory" element={<InventoryDashboard />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/settings" element={<Settings />} />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
       </Routes>
