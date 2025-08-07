@@ -1,6 +1,5 @@
-import { Bell, Search, Shield, User, Brain, TrendingUp, Pill, Package } from "lucide-react";
+import { Bell, Shield, User, Brain, TrendingUp, Pill, Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Link } from "react-router-dom";
 
 export const Header = () => {
@@ -17,14 +16,6 @@ export const Header = () => {
       </div>
 
       <div className="flex items-center gap-4">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input 
-            placeholder="Search inventory..." 
-            className="pl-9 w-64 bg-muted/50 border-border"
-          />
-        </div>
-        
         <Link to="/infinite-memory">
           <Button variant="outline" className="font-semibold">
             <Brain className="h-4 w-4 mr-2" />
