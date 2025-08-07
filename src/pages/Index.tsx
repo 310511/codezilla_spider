@@ -4,6 +4,7 @@ import { InventoryTable } from "@/components/dashboard/InventoryTable";
 import { BlockchainActivity } from "@/components/dashboard/BlockchainActivity";
 import { AlertsPanel } from "@/components/dashboard/AlertsPanel";
 import InventoryNav from "@/components/inventory/InventoryNav";
+import { NotificationTest } from "@/components/ui/notification-test";
 import heroImage from "@/assets/medical-hero.jpg";
 
 const Index = () => {
@@ -66,6 +67,7 @@ const Index = () => {
               <AlertsPanel />
               <BlockchainActivity />
               <InventoryNav />
+              <NotificationTest />
             </div>
           </div>
         </div>

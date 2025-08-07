@@ -10,6 +10,7 @@ import { SupplierDashboard } from "@/components/marketplace/SupplierDashboard";
 import { InfiniteMemoryProvider } from "@/contexts/InfiniteMemoryContext";
 import { BlockchainProvider } from "@/contexts/BlockchainContext";
 import { InventoryProvider } from "@/contexts/InventoryContext";
+import { NotificationProvider } from "@/contexts/NotificationContext";
 import { InfiniteMemoryDashboard } from "@/components/infinite-memory/InfiniteMemoryDashboard";
 import { InfiniteMemoryDemo } from "@/components/infinite-memory/InfiniteMemoryDemo";
 import { MLPredictionsDashboard } from "@/components/ml-predictions/MLPredictionsDashboard";
@@ -54,15 +55,17 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <BlockchainProvider>
       <InventoryProvider>
-        <InfiniteMemoryProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
-              <AppContent />
-            </BrowserRouter>
-          </TooltipProvider>
-        </InfiniteMemoryProvider>
+        <NotificationProvider>
+          <InfiniteMemoryProvider>
+            <TooltipProvider>
+              <Toaster />
+              <Sonner />
+              <BrowserRouter>
+                <AppContent />
+              </BrowserRouter>
+            </TooltipProvider>
+          </InfiniteMemoryProvider>
+        </NotificationProvider>
       </InventoryProvider>
     </BlockchainProvider>
   </QueryClientProvider>
