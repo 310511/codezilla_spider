@@ -37,9 +37,9 @@ MedChain is a cutting-edge medical inventory management system that leverages bl
 | Avatar | Name | Role | ID | GitHub | Contributions |
 |--------|------|------|-----|--------|---------------|
 | 🧑‍💼 | Punya Mittal | Team Lead & Full Stack Developer | 24BAI1325 | @punyamittal | Project Architecture, Frontend Development, Team Coordination |
-| 🔧 | Utsav Gautam | Backend & ML Engineer | 24BPS1116 | @utsavgautam | API Development, ML Models, Database Design |
-| 💻 | Vaibhav Raj | Full Stack Developer | 24BAI1281 | @vaibhavraj | Frontend Components, Blockchain Integration, Testing |
-| 🎨 | Kamakshi | UI/UX Designer & Frontend Developer | 24BPS1109 | @kamakshi | UI Design, User Experience, Component Styling |
+| 🔧 | Utsav Gautam | Backend & ML Engineer | 24BPS1116 | @310511 | API Development, ML Models, Database Design |
+| 💻 | Vaibhav Raj | Full Stack Developer | 24BAI1281 | @veebbruh | Frontend Components, Blockchain Integration, Testing |
+| 🎨 | Kamakshi | UI/UX Designer & Frontend Developer | 24BPS1109 | @kamakshi-865 | UI Design, User Experience, Component Styling |
 
 ### 📊 Team Contribution Matrix
 
