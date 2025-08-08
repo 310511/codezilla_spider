@@ -17,6 +17,8 @@ import { MLPredictionsDashboard } from "@/components/ml-predictions/MLPrediction
 import { EnhancedMLPredictionsDashboard } from "@/components/ml-predictions/EnhancedMLPredictionsDashboard";
 import { MedicineRecommendationDashboard } from "@/components/medicine-recommendation/MedicineRecommendationDashboard";
 import { EnhancedMedicineAIDashboard } from "@/components/medicine-recommendation/EnhancedMedicineAIDashboard";
+import { SkinAnalysisDashboard } from "@/components/flask-integration/SkinAnalysisDashboard";
+import VoiceMedicineAssistant from "@/components/voice-assistant/VoiceMedicineAssistant";
 import InventoryDashboard from "@/components/inventory/InventoryDashboard";
 import RFIDDashboard from "@/components/rfid/RFIDDashboard";
 import { Notifications } from "@/components/ui/notifications";
@@ -50,6 +52,8 @@ const AppContent = () => {
         <Route path="/enhanced-ml-predictions" element={<EnhancedMLPredictionsDashboard />} />
         <Route path="/medicine-recommendation" element={<EnhancedMedicineAIDashboard />} />
         <Route path="/enhanced-medicine-ai" element={<EnhancedMedicineAIDashboard />} />
+        <Route path="/skin-analysis" element={<SkinAnalysisDashboard />} />
+        <Route path="/voice-medicine" element={<VoiceMedicineAssistant />} />
         <Route path="/inventory" element={<InventoryDashboard />} />
         <Route path="/rfid" element={<RFIDDashboard />} />
         <Route path="/profile" element={<Profile />} />

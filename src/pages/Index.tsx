@@ -5,8 +5,7 @@ import { InventoryTable } from "@/components/dashboard/InventoryTable";
 import { BlockchainActivity } from "@/components/dashboard/BlockchainActivity";
 import { AlertsPanel } from "@/components/dashboard/AlertsPanel";
 import InventoryNav from "@/components/inventory/InventoryNav";
-import { NotificationTest } from "@/components/ui/notification-test";
-import { RoleSwitcher } from "@/components/ui/role-switcher";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -34,7 +33,6 @@ import {
 } from "lucide-react";
 
 const Index = () => {
-  const [currentRole, setCurrentRole] = useState<"admin" | "manager" | "staff" | "supplier">("admin");
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
@@ -244,11 +242,6 @@ const Index = () => {
               <AlertsPanel />
               <BlockchainActivity />
               <InventoryNav />
-              <NotificationTest />
-              <RoleSwitcher 
-                currentRole={currentRole} 
-                onRoleChange={setCurrentRole} 
-              />
             </div>
           </div>
         </div>

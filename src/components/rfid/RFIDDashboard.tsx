@@ -36,7 +36,8 @@ import {
   Signal,
   SignalHigh,
   SignalMedium,
-  SignalLow
+  SignalLow,
+  X
 } from "lucide-react";
 
 interface RFIDTag {
@@ -72,9 +73,19 @@ const RFIDDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState("overview");
   const [searchTerm, setSearchTerm] = useState("");
   const [isAssigning, setIsAssigning] = useState(false);
+  const [assignmentMessage, setAssignmentMessage] = useState("");
+  const [selectedTag, setSelectedTag] = useState<RFIDTag | null>(null);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
+  const [analyticsData, setAnalyticsData] = useState<any>(null);
+  const [isLoadingAnalytics, setIsLoadingAnalytics] = useState(false);
+  const [quickActionMessage, setQuickActionMessage] = useState("");
+  const [isPerformingQuickAction, setIsPerformingQuickAction] = useState(false);
 
   useEffect(() => {
     fetchRFIDData();
+    loadAnalyticsData();
   }, []);
 
   const fetchRFIDData = async () => {
@@ -106,18 +117,221 @@ const RFIDDashboard: React.FC = () => {
   const assignRFIDTags = async () => {
     try {
       setIsAssigning(true);
+      setAssignmentMessage("");
       const response = await fetch("http://localhost:8000/rfid/assign", {
         method: "POST"
       });
       
       if (response.ok) {
+        const result = await response.json();
+        setAssignmentMessage(`✅ Successfully assigned ${result.assigned} RFID tags!`);
         await fetchRFIDData(); // Refresh data
+        
+        // Clear message after 3 seconds
+        setTimeout(() => setAssignmentMessage(""), 3000);
+      } else {
+        setAssignmentMessage("❌ Failed to assign RFID tags");
+        setTimeout(() => setAssignmentMessage(""), 3000);
       }
     } catch (error) {
       console.error("Error assigning RFID tags:", error);
+      setAssignmentMessage("❌ Error assigning RFID tags");
+      setTimeout(() => setAssignmentMessage(""), 3000);
     } finally {
       setIsAssigning(false);
     }
+  };
+
+  const handleViewTag = (tag: RFIDTag) => {
+    setSelectedTag(tag);
+    setIsViewModalOpen(true);
+  };
+
+  const handleEditTag = (tag: RFIDTag) => {
+    setSelectedTag(tag);
+    setIsEditModalOpen(true);
+  };
+
+  const handleUpdateTag = async (updatedTag: RFIDTag) => {
+    try {
+      const response = await fetch(`http://localhost:8000/rfid/tags/${updatedTag.tag_id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updatedTag),
+      });
+      
+      if (response.ok) {
+        await fetchRFIDData(); // Refresh data
+        setIsEditModalOpen(false);
+        setSelectedTag(null);
+      } else {
+        console.error("Failed to update RFID tag");
+      }
+    } catch (error) {
+      console.error("Error updating RFID tag:", error);
+    }
+  };
+
+  const exportRFIDData = async () => {
+    try {
+      setIsExporting(true);
+      
+      // Create PDF content using jsPDF
+      const { jsPDF } = await import('jspdf');
+      const doc = new jsPDF();
+      
+      // Add title
+      doc.setFontSize(20);
+      doc.text('RFID Management Report', 20, 20);
+      
+      // Add date
+      doc.setFontSize(12);
+      doc.text(`Generated on: ${new Date().toLocaleString()}`, 20, 30);
+      
+      // Add summary
+      doc.setFontSize(14);
+      doc.text('Summary', 20, 45);
+      doc.setFontSize(10);
+      doc.text(`Total RFID Tags: ${rfidTags.length}`, 20, 55);
+      doc.text(`Active Tags: ${rfidTags.filter(t => t.status === 'active').length}`, 20, 65);
+      doc.text(`Lost Tags: ${rfidTags.filter(t => t.status === 'lost').length}`, 20, 75);
+      doc.text(`Damaged Tags: ${rfidTags.filter(t => t.status === 'damaged').length}`, 20, 85);
+      doc.text(`Coverage Rate: ${((supplies.filter(s => s.rfid_tag).length / supplies.length) * 100).toFixed(1)}%`, 20, 95);
+      
+      // Add detailed table
+      doc.setFontSize(14);
+      doc.text('RFID Tags Details', 20, 115);
+      
+      let yPosition = 125;
+      rfidTags.forEach((tag, index) => {
+        if (yPosition > 250) {
+          doc.addPage();
+          yPosition = 20;
+        }
+        
+        doc.setFontSize(10);
+        doc.text(`${index + 1}. ${tag.item_name}`, 20, yPosition);
+        doc.setFontSize(8);
+        doc.text(`Tag ID: ${tag.tag_id}`, 25, yPosition + 5);
+        doc.text(`Status: ${tag.status}`, 25, yPosition + 10);
+        doc.text(`Generated: ${new Date(tag.generated_at).toLocaleDateString()}`, 25, yPosition + 15);
+        
+        yPosition += 25;
+      });
+      
+      // Save PDF
+      doc.save(`rfid_report_${new Date().toISOString().split('T')[0]}.pdf`);
+      
+    } catch (error) {
+      console.error("Error exporting RFID data:", error);
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  const performQuickAction = async (action: string) => {
+    try {
+      setIsPerformingQuickAction(true);
+      setQuickActionMessage("");
+      
+      switch (action) {
+        case 'assign_all':
+          const response = await fetch("http://localhost:8000/rfid/assign", {
+            method: "POST"
+          });
+          if (response.ok) {
+            const result = await response.json();
+            setQuickActionMessage(`✅ Successfully assigned ${result.assigned} RFID tags!`);
+            await fetchRFIDData();
+          } else {
+            setQuickActionMessage("❌ Failed to assign RFID tags");
+          }
+          break;
+          
+        case 'validate_all':
+          const validateResponse = await fetch("http://localhost:8000/rfid/validate", {
+            method: "POST"
+          });
+          if (validateResponse.ok) {
+            const validateResult = await validateResponse.json();
+            setQuickActionMessage(`✅ Validated ${validateResult.validated} RFID tags!`);
+          } else {
+            setQuickActionMessage("❌ Failed to validate RFID tags");
+          }
+          break;
+          
+        case 'refresh_all':
+          await fetchRFIDData();
+          await loadAnalyticsData();
+          setQuickActionMessage("✅ All data refreshed successfully!");
+          break;
+          
+        case 'export_report':
+          await exportRFIDData();
+          setQuickActionMessage("✅ Report exported successfully!");
+          break;
+          
+        default:
+          setQuickActionMessage("❌ Unknown action");
+      }
+      
+      // Clear message after 3 seconds
+      setTimeout(() => {
+        setQuickActionMessage("");
+      }, 3000);
+      
+    } catch (error) {
+      console.error("Error performing quick action:", error);
+      setQuickActionMessage("❌ Error performing action");
+    } finally {
+      setIsPerformingQuickAction(false);
+    }
+  };
+
+  const loadAnalyticsData = async () => {
+    try {
+      setIsLoadingAnalytics(true);
+      
+      // Fetch analytics data from backend
+      const response = await fetch("http://localhost:8000/rfid/statistics");
+      
+      if (response.ok) {
+        const data = await response.json();
+        setAnalyticsData(data);
+      } else {
+        console.error("Failed to load analytics data");
+      }
+    } catch (error) {
+      console.error("Error loading analytics data:", error);
+    } finally {
+      setIsLoadingAnalytics(false);
+    }
+  };
+
+  const getAnalyticsInsights = () => {
+    if (!analyticsData) return null;
+    
+    const totalTags = rfidTags.length;
+    const activeTags = rfidTags.filter(t => t.status === 'active').length;
+    const lostTags = rfidTags.filter(t => t.status === 'lost').length;
+    const damagedTags = rfidTags.filter(t => t.status === 'damaged').length;
+    const inactiveTags = rfidTags.filter(t => t.status === 'inactive').length;
+    
+    const coveragePercentage = supplies.length > 0 ? ((supplies.filter(s => s.rfid_tag).length / supplies.length) * 100).toFixed(1) : '0';
+    
+    return {
+      totalTags,
+      activeTags,
+      lostTags,
+      damagedTags,
+      inactiveTags,
+      coveragePercentage,
+      totalSupplies: supplies.length,
+      suppliesWithRFID: supplies.filter(s => s.rfid_tag).length,
+      suppliesWithoutRFID: suppliesWithoutRFID.length
+    };
   };
 
   const getStatusBadge = (status: string) => {
@@ -239,6 +453,22 @@ const RFIDDashboard: React.FC = () => {
             </div>
           </div>
         </div>
+
+        {/* Assignment Message */}
+        {assignmentMessage && (
+          <div className="relative">
+            <div className="bg-gradient-to-r from-green-50 to-blue-50 border border-green-200 rounded-xl p-4 shadow-lg">
+              <div className="flex items-center space-x-3">
+                <div className="p-2 bg-green-500 rounded-full">
+                  <CheckCircle className="w-5 h-5 text-white" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-green-800 font-medium">{assignmentMessage}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Statistics Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -494,10 +724,30 @@ const RFIDDashboard: React.FC = () => {
                     <span>Filter</span>
                   </Button>
                 </div>
-                <Button className="bg-gradient-to-r from-blue-500 to-purple-600 text-white">
-                  <Plus className="w-4 h-4 mr-2" />
-                  Add RFID Tag
-                </Button>
+                <div className="flex space-x-2">
+                  <Button 
+                    onClick={exportRFIDData} 
+                    disabled={isExporting || rfidTags.length === 0}
+                    variant="outline"
+                    className="bg-gradient-to-r from-green-500 to-emerald-600 text-white hover:from-green-600 hover:to-emerald-700"
+                  >
+                    {isExporting ? (
+                      <>
+                        <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                        Exporting...
+                      </>
+                    ) : (
+                      <>
+                        <Download className="w-4 h-4 mr-2" />
+                        Export Data
+                      </>
+                    )}
+                  </Button>
+                  <Button className="bg-gradient-to-r from-blue-500 to-purple-600 text-white">
+                    <Plus className="w-4 h-4 mr-2" />
+                    Add RFID Tag
+                  </Button>
+                </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -545,11 +795,21 @@ const RFIDDashboard: React.FC = () => {
                       </div>
 
                       <div className="flex space-x-2 pt-3">
-                        <Button size="sm" variant="outline" className="flex-1">
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          className="flex-1 hover:bg-blue-50 hover:border-blue-300"
+                          onClick={() => handleViewTag(tag)}
+                        >
                           <Eye className="w-4 h-4 mr-1" />
                           View
                         </Button>
-                        <Button size="sm" variant="outline" className="flex-1">
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          className="flex-1 hover:bg-green-50 hover:border-green-300"
+                          onClick={() => handleEditTag(tag)}
+                        >
                           <Edit className="w-4 h-4 mr-1" />
                           Edit
                         </Button>
@@ -618,11 +878,27 @@ const RFIDDashboard: React.FC = () => {
                       )}
 
                       <div className="flex space-x-2 pt-3">
-                        <Button size="sm" variant="outline" className="flex-1">
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          className="flex-1 hover:bg-blue-50 hover:border-blue-300"
+                          onClick={() => {
+                            const tag = rfidTags.find(t => t.item_id === supply.id);
+                            if (tag) handleViewTag(tag);
+                          }}
+                        >
                           <Eye className="w-4 h-4 mr-1" />
                           View
                         </Button>
-                        <Button size="sm" variant="outline" className="flex-1">
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          className="flex-1 hover:bg-green-50 hover:border-green-300"
+                          onClick={() => {
+                            const tag = rfidTags.find(t => t.item_id === supply.id);
+                            if (tag) handleEditTag(tag);
+                          }}
+                        >
                           <Edit className="w-4 h-4 mr-1" />
                           Edit
                         </Button>
@@ -634,6 +910,51 @@ const RFIDDashboard: React.FC = () => {
             </TabsContent>
 
             <TabsContent value="analytics" className="p-6 space-y-6">
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h3 className="text-lg font-semibold">RFID Analytics Dashboard</h3>
+                  <p className="text-muted-foreground">Comprehensive analytics and insights for RFID management</p>
+                </div>
+                <div className="flex space-x-2">
+                  <Button 
+                    onClick={loadAnalyticsData} 
+                    disabled={isLoadingAnalytics}
+                    variant="outline"
+                    className="bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:from-blue-600 hover:to-purple-700"
+                  >
+                    {isLoadingAnalytics ? (
+                      <>
+                        <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                        Loading...
+                      </>
+                    ) : (
+                      <>
+                        <BarChart3 className="w-4 h-4 mr-2" />
+                        Refresh Analytics
+                      </>
+                    )}
+                  </Button>
+                  <Button 
+                    onClick={exportRFIDData} 
+                    disabled={isExporting || rfidTags.length === 0}
+                    variant="outline"
+                    className="bg-gradient-to-r from-green-500 to-emerald-600 text-white hover:from-green-600 hover:to-emerald-700"
+                  >
+                    {isExporting ? (
+                      <>
+                        <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                        Exporting...
+                      </>
+                    ) : (
+                      <>
+                        <Download className="w-4 h-4 mr-2" />
+                        Export Analytics
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </div>
+              
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* RFID Coverage */}
                 <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
@@ -713,6 +1034,61 @@ const RFIDDashboard: React.FC = () => {
                 </Card>
               </div>
 
+              {/* Analytics Insights */}
+              <Card className="bg-gradient-to-br from-indigo-50 to-indigo-100 border-indigo-200">
+                <CardHeader>
+                  <CardTitle className="flex items-center space-x-2 text-indigo-700">
+                    <TrendingUp className="w-5 h-5" />
+                    <span>Analytics Insights</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {(() => {
+                      const insights = getAnalyticsInsights();
+                      if (!insights) return null;
+                      
+                      return (
+                        <>
+                          <div className="bg-white/50 rounded-lg p-4 text-center">
+                            <div className="text-2xl font-bold text-indigo-600">{insights.totalTags}</div>
+                            <div className="text-sm text-indigo-700">Total RFID Tags</div>
+                          </div>
+                          <div className="bg-white/50 rounded-lg p-4 text-center">
+                            <div className="text-2xl font-bold text-green-600">{insights.activeTags}</div>
+                            <div className="text-sm text-green-700">Active Tags</div>
+                          </div>
+                          <div className="bg-white/50 rounded-lg p-4 text-center">
+                            <div className="text-2xl font-bold text-red-600">{insights.lostTags}</div>
+                            <div className="text-sm text-red-700">Lost Tags</div>
+                          </div>
+                          <div className="bg-white/50 rounded-lg p-4 text-center">
+                            <div className="text-2xl font-bold text-orange-600">{insights.damagedTags}</div>
+                            <div className="text-sm text-orange-700">Damaged Tags</div>
+                          </div>
+                          <div className="bg-white/50 rounded-lg p-4 text-center">
+                            <div className="text-2xl font-bold text-blue-600">{insights.totalSupplies}</div>
+                            <div className="text-sm text-blue-700">Total Supplies</div>
+                          </div>
+                          <div className="bg-white/50 rounded-lg p-4 text-center">
+                            <div className="text-2xl font-bold text-green-600">{insights.suppliesWithRFID}</div>
+                            <div className="text-sm text-green-700">With RFID</div>
+                          </div>
+                          <div className="bg-white/50 rounded-lg p-4 text-center">
+                            <div className="text-2xl font-bold text-orange-600">{insights.suppliesWithoutRFID}</div>
+                            <div className="text-sm text-orange-700">Without RFID</div>
+                          </div>
+                          <div className="bg-white/50 rounded-lg p-4 text-center">
+                            <div className="text-2xl font-bold text-purple-600">{insights.coveragePercentage}%</div>
+                            <div className="text-sm text-purple-700">Coverage Rate</div>
+                          </div>
+                        </>
+                      );
+                    })()}
+                  </div>
+                </CardContent>
+              </Card>
+
               {/* Recent Activity Timeline */}
               <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
                 <CardHeader>
@@ -751,6 +1127,165 @@ const RFIDDashboard: React.FC = () => {
           </Tabs>
         </Card>
       </div>
+
+      {/* View RFID Tag Modal */}
+      {isViewModalOpen && selectedTag && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold">RFID Tag Details</h3>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsViewModalOpen(false)}
+              >
+                <X className="w-4 h-4" />
+              </Button>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm font-medium text-gray-700">Item Name</label>
+                <p className="text-sm text-gray-900 mt-1">{selectedTag.item_name}</p>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-700">RFID Tag ID</label>
+                <p className="text-sm font-mono text-gray-900 mt-1">{selectedTag.tag_id}</p>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-700">Status</label>
+                <div className="mt-1">{getStatusBadge(selectedTag.status)}</div>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-700">Generated</label>
+                <p className="text-sm text-gray-900 mt-1">
+                  {new Date(selectedTag.generated_at).toLocaleString()}
+                </p>
+              </div>
+              {selectedTag.last_scan && (
+                <div>
+                  <label className="text-sm font-medium text-gray-700">Last Scan</label>
+                  <p className="text-sm text-gray-900 mt-1">
+                    {new Date(selectedTag.last_scan).toLocaleString()}
+                  </p>
+                </div>
+              )}
+              {selectedTag.location && (
+                <div>
+                  <label className="text-sm font-medium text-gray-700">Location</label>
+                  <p className="text-sm text-gray-900 mt-1">{selectedTag.location}</p>
+                </div>
+              )}
+              {selectedTag.battery_level && (
+                <div>
+                  <label className="text-sm font-medium text-gray-700">Battery Level</label>
+                  <div className="flex items-center space-x-2 mt-1">
+                    <Progress value={selectedTag.battery_level} className="w-20 h-2" />
+                    <span className="text-sm text-gray-900">{selectedTag.battery_level}%</span>
+                  </div>
+                </div>
+              )}
+              {selectedTag.signal_strength && (
+                <div>
+                  <label className="text-sm font-medium text-gray-700">Signal Strength</label>
+                  <div className="flex items-center space-x-2 mt-1">
+                    {getSignalStrengthIcon(selectedTag.signal_strength)}
+                    <span className="text-sm text-gray-900">{selectedTag.signal_strength}</span>
+                  </div>
+                </div>
+              )}
+            </div>
+            <div className="flex justify-end mt-6">
+              <Button onClick={() => setIsViewModalOpen(false)}>
+                Close
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit RFID Tag Modal */}
+      {isEditModalOpen && selectedTag && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold">Edit RFID Tag</h3>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsEditModalOpen(false)}
+              >
+                <X className="w-4 h-4" />
+              </Button>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm font-medium text-gray-700">Item Name</label>
+                <p className="text-sm text-gray-900 mt-1">{selectedTag.item_name}</p>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-700">RFID Tag ID</label>
+                <p className="text-sm font-mono text-gray-900 mt-1">{selectedTag.tag_id}</p>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-700">Status</label>
+                <select 
+                  className="w-full mt-1 p-2 border border-gray-300 rounded-md"
+                  value={selectedTag.status}
+                  onChange={(e) => setSelectedTag({...selectedTag, status: e.target.value as any})}
+                >
+                  <option value="active">Active</option>
+                  <option value="inactive">Inactive</option>
+                  <option value="lost">Lost</option>
+                  <option value="damaged">Damaged</option>
+                </select>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-700">Location</label>
+                <input
+                  type="text"
+                  className="w-full mt-1 p-2 border border-gray-300 rounded-md"
+                  value={selectedTag.location || ''}
+                  onChange={(e) => setSelectedTag({...selectedTag, location: e.target.value})}
+                  placeholder="Enter location"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-700">Battery Level (%)</label>
+                <input
+                  type="number"
+                  min="0"
+                  max="100"
+                  className="w-full mt-1 p-2 border border-gray-300 rounded-md"
+                  value={selectedTag.battery_level || ''}
+                  onChange={(e) => setSelectedTag({...selectedTag, battery_level: parseInt(e.target.value) || undefined})}
+                  placeholder="0-100"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-700">Signal Strength</label>
+                <select 
+                  className="w-full mt-1 p-2 border border-gray-300 rounded-md"
+                  value={selectedTag.signal_strength || 'none'}
+                  onChange={(e) => setSelectedTag({...selectedTag, signal_strength: e.target.value as any})}
+                >
+                  <option value="none">None</option>
+                  <option value="low">Low</option>
+                  <option value="medium">Medium</option>
+                  <option value="high">High</option>
+                </select>
+              </div>
+            </div>
+            <div className="flex justify-end space-x-2 mt-6">
+              <Button variant="outline" onClick={() => setIsEditModalOpen(false)}>
+                Cancel
+              </Button>
+              <Button onClick={() => handleUpdateTag(selectedTag)}>
+                Save Changes
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

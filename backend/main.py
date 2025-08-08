@@ -325,6 +325,10 @@ def generate_smart_answer(query: str, user_memories: List[Dict]) -> str:
 def read_root():
     return {"message": "Welcome to the INFINITE-MEMORY API - Improved Version 2.0"}
 
+@app.get("/health")
+def health_check():
+    return {"status": "healthy", "service": "infinite-memory-api", "version": "2.0.0"}
+
 @app.post("/process-text")
 async def process_text(request: ProcessTextRequest):
     """Process text input and return analysis"""
@@ -914,6 +918,203 @@ async def get_suppliers():
         ]
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Suppliers retrieval error: {str(e)}")
+
+# RFID Endpoints
+class RFIDTag(BaseModel):
+    tag_id: str
+    item_id: str
+    item_name: str
+    generated_at: str
+    checksum: str
+    status: str = "active"
+    last_scan: Optional[str] = None
+    location: Optional[str] = None
+    battery_level: Optional[int] = None
+    signal_strength: Optional[str] = None
+
+# In-memory RFID storage (in production, use a database)
+rfid_tags: Dict[str, RFIDTag] = {}
+
+@app.get("/rfid/tags")
+async def get_rfid_tags():
+    """Get all RFID tags"""
+    try:
+        return list(rfid_tags.values())
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"RFID tags retrieval error: {str(e)}")
+
+@app.post("/rfid/assign")
+async def assign_rfid_tags():
+    """Assign RFID tags to medical supplies"""
+    try:
+        import uuid
+        import hashlib
+        from datetime import datetime
+        
+        # Get medical supplies
+        supplies = alerts_service.get_medical_supplies()
+        
+        assigned_count = 0
+        failed_count = 0
+        assigned_tags = []
+        
+        # Check if all supplies already have RFID tags
+        supplies_without_rfid = []
+        for supply in supplies:
+            existing_tag = None
+            for tag in rfid_tags.values():
+                if tag.item_id == supply.id:
+                    existing_tag = tag
+                    break
+            
+            if not existing_tag:
+                supplies_without_rfid.append(supply)
+        
+        # If all supplies have RFID tags, create additional tags for demonstration
+        if not supplies_without_rfid:
+            # Create additional RFID tags for demonstration
+            for i, supply in enumerate(supplies[:3]):  # Assign to first 3 supplies
+                try:
+                    # Generate unique RFID tag with new timestamp
+                    timestamp = datetime.now().strftime("%Y%m%dT%H%M%SZ")
+                    uuid_short = str(uuid.uuid4())[:8]
+                    tag_id = f"RFID-{supply.id}-{timestamp}-{uuid_short}"
+                    
+                    # Generate checksum
+                    checksum = hashlib.md5(tag_id.encode()).hexdigest()[:8]
+                    
+                    # Create RFID tag
+                    rfid_tag = RFIDTag(
+                        tag_id=tag_id,
+                        item_id=supply.id,
+                        item_name=supply.name,
+                        generated_at=datetime.now().isoformat(),
+                        checksum=checksum,
+                        status="active"
+                    )
+                    
+                    # Store the tag
+                    rfid_tags[tag_id] = rfid_tag
+                    assigned_count += 1
+                    assigned_tags.append({
+                        "item_name": supply.name,
+                        "tag_id": tag_id
+                    })
+                    
+                except Exception as e:
+                    failed_count += 1
+                    print(f"Failed to assign RFID tag to {supply.name}: {e}")
+        else:
+            # Assign RFID tags to supplies that don't have them
+            for supply in supplies_without_rfid:
+                try:
+                    # Generate unique RFID tag
+                    timestamp = datetime.now().strftime("%Y%m%dT%H%M%SZ")
+                    uuid_short = str(uuid.uuid4())[:8]
+                    tag_id = f"RFID-{supply.id}-{timestamp}-{uuid_short}"
+                    
+                    # Generate checksum
+                    checksum = hashlib.md5(tag_id.encode()).hexdigest()[:8]
+                    
+                    # Create RFID tag
+                    rfid_tag = RFIDTag(
+                        tag_id=tag_id,
+                        item_id=supply.id,
+                        item_name=supply.name,
+                        generated_at=datetime.now().isoformat(),
+                        checksum=checksum,
+                        status="active"
+                    )
+                    
+                    # Store the tag
+                    rfid_tags[tag_id] = rfid_tag
+                    assigned_count += 1
+                    assigned_tags.append({
+                        "item_name": supply.name,
+                        "tag_id": tag_id
+                    })
+                    
+                except Exception as e:
+                    failed_count += 1
+                    print(f"Failed to assign RFID tag to {supply.name}: {e}")
+        
+        return {
+            "status": "success",
+            "message": "RFID assignment completed",
+            "assigned": assigned_count,
+            "failed": failed_count,
+            "total_supplies": len(supplies),
+            "supplies_without_rfid": len(supplies_without_rfid),
+            "assigned_tags": assigned_tags
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"RFID assignment error: {str(e)}")
+
+@app.get("/rfid/statistics")
+async def get_rfid_statistics():
+    """Get RFID statistics"""
+    try:
+        supplies = alerts_service.get_medical_supplies()
+        total_supplies = len(supplies)
+        supplies_with_rfid = len([s for s in supplies if any(tag.item_id == s.id for tag in rfid_tags.values())])
+        supplies_without_rfid = total_supplies - supplies_with_rfid
+        rfid_coverage = (supplies_with_rfid / total_supplies * 100) if total_supplies > 0 else 0
+        
+        active_tags = len([tag for tag in rfid_tags.values() if tag.status == "active"])
+        inactive_tags = len([tag for tag in rfid_tags.values() if tag.status != "active"])
+        
+        return {
+            "total_supplies": total_supplies,
+            "supplies_with_rfid": supplies_with_rfid,
+            "supplies_without_rfid": supplies_without_rfid,
+            "rfid_coverage_percentage": rfid_coverage,
+            "total_rfid_tags": len(rfid_tags),
+            "active_rfid_tags": active_tags,
+            "inactive_rfid_tags": inactive_tags
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"RFID statistics error: {str(e)}")
+
+@app.post("/rfid/validate")
+async def validate_rfid_tags():
+    """Validate existing RFID tags for integrity"""
+    try:
+        total_tags = len(rfid_tags)
+        valid_tags = 0
+        invalid_tags = 0
+        errors = []
+        
+        for tag in rfid_tags.values():
+            try:
+                # Validate checksum
+                import hashlib
+                expected_checksum = hashlib.md5(tag.tag_id.encode()).hexdigest()[:8]
+                
+                if tag.checksum == expected_checksum:
+                    valid_tags += 1
+                else:
+                    invalid_tags += 1
+                    errors.append({
+                        "tag_id": tag.tag_id,
+                        "error": "Invalid checksum"
+                    })
+                    
+            except Exception as e:
+                invalid_tags += 1
+                errors.append({
+                    "tag_id": tag.tag_id,
+                    "error": str(e)
+                })
+        
+        return {
+            "total_tags": total_tags,
+            "valid_tags": valid_tags,
+            "invalid_tags": invalid_tags,
+            "errors": errors
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"RFID validation error: {str(e)}")
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000) 

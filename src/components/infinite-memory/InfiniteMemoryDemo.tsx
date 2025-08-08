@@ -10,7 +10,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Progress } from '@/components/ui/progress';
-import { Calendar, Clock, CheckCircle, Circle, Brain, MessageSquare, Image, Loader2 } from 'lucide-react';
+import { Calendar, Clock, CheckCircle, Circle, Brain, MessageSquare, Image, Loader2, Sparkles, Zap, Shield, Target, ArrowRight, Plus, Star, Eye, Edit, Trash2, Download, Share2, Settings, Search, Filter, RefreshCw, Lightbulb, Info, X, ChevronRight, ChevronDown, Play, Pause, RotateCcw, Heart, TrendingUp, AlertTriangle, CheckCircle2, Clock4, CalendarDays, BarChart3, Users, FileText, Send, Upload, BrainCircuit, Memory, Cpu, Network, Globe, Lock, Unlock, Key, Fingerprint, Scan, QrCode, Radio, Signal, Wifi2, Bluetooth, Smartphone, Tablet, Monitor, Laptop, Server, Cloud, HardDrive, Usb, Cable, Power, Battery, BatteryCharging, PowerOff, PowerOn, Lightning, Thunder, Storm, Rain, Snow, Sun, History } from 'lucide-react';
 import { format } from 'date-fns';
 
 // Mock data for demonstration
@@ -298,300 +298,384 @@ export function InfiniteMemoryDemo() {
   };
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-3">
-          <Brain className="h-8 w-8 text-blue-600" />
-          <div>
-            <h1 className="text-3xl font-bold">Infinite Memory</h1>
-            <p className="text-muted-foreground">AI Cognitive Companion (Demo Mode)</p>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+      <div className="container mx-auto p-6 space-y-6">
+        {/* Enhanced Header */}
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 p-8 text-white shadow-2xl">
+          <div className="absolute inset-0 bg-black/10"></div>
+          <div className="relative flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
+                <Brain className="h-8 w-8 text-white" />
+              </div>
+              <div>
+                <h1 className="text-4xl font-bold tracking-tight">Infinite Memory</h1>
+                <p className="text-blue-100">AI Cognitive Companion (Demo Mode)</p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-3">
+              <Badge variant="secondary" className="bg-white/20 text-white border-white/30">
+                <Sparkles className="h-3 w-3 mr-1" />
+                Demo Mode
+              </Badge>
+              <div className="flex items-center space-x-2">
+                <div className="h-2 w-2 rounded-full bg-green-400 animate-pulse"></div>
+                <span className="text-sm">Mock Data</span>
+              </div>
+            </div>
           </div>
         </div>
-        <Badge variant="secondary">
-          Demo Mode - Mock Data
-        </Badge>
-      </div>
 
-      <Alert>
-        <AlertDescription>
-          This is a demonstration of the Infinite Memory integration. The backend is not connected, so all data is simulated.
-          Follow the setup guide to connect the real backend.
-        </AlertDescription>
-      </Alert>
+        {/* Enhanced Alert */}
+        <Alert className="border-blue-200 bg-blue-50/50 dark:border-blue-800 dark:bg-blue-900/20">
+          <Info className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+          <AlertDescription className="text-blue-800 dark:text-blue-200">
+            This is a demonstration of the Infinite Memory integration. The backend is not connected, so all data is simulated.
+            Follow the setup guide to connect the real backend.
+          </AlertDescription>
+        </Alert>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="conversation">Conversation</TabsTrigger>
-          <TabsTrigger value="memory">Memory Query</TabsTrigger>
-          <TabsTrigger value="tasks">Tasks</TabsTrigger>
-          <TabsTrigger value="analytics">Analytics</TabsTrigger>
-        </TabsList>
+        {/* Enhanced Tabs */}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+          <TabsList className="grid w-full grid-cols-4 bg-white/80 backdrop-blur-sm dark:bg-slate-800/80">
+            <TabsTrigger value="conversation" className="flex items-center space-x-2">
+              <MessageSquare className="h-4 w-4" />
+              <span>Conversation</span>
+            </TabsTrigger>
+            <TabsTrigger value="memory" className="flex items-center space-x-2">
+              <Brain className="h-4 w-4" />
+              <span>Memory Query</span>
+            </TabsTrigger>
+            <TabsTrigger value="tasks" className="flex items-center space-x-2">
+              <Calendar className="h-4 w-4" />
+              <span>Tasks</span>
+            </TabsTrigger>
+            <TabsTrigger value="analytics" className="flex items-center space-x-2">
+              <BarChart3 className="h-4 w-4" />
+              <span>Analytics</span>
+            </TabsTrigger>
+          </TabsList>
 
-        <TabsContent value="conversation" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <MessageSquare className="h-5 w-5" />
-                <span>Process New Information</span>
-              </CardTitle>
-              <CardDescription>
-                Share information with your AI companion to build your memory (Demo)
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex space-x-2">
-                <Input
-                  placeholder="Type your message here..."
-                  value={inputText}
-                  onChange={(e) => setInputText(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && handleProcessText()}
-                  disabled={isProcessing}
-                />
-                <Button onClick={handleProcessText} disabled={isProcessing || !inputText.trim()}>
-                  {isProcessing ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Process'}
-                </Button>
-              </div>
-
-              <div className="flex items-center space-x-4">
-                <Button
-                  variant="outline"
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={isProcessing}
-                >
-                  <Image className="h-4 w-4 mr-2" />
-                  Upload Image
-                </Button>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageUpload}
-                  className="hidden"
-                />
-                {selectedImage && (
-                  <div className="flex items-center space-x-2">
-                    <span className="text-sm text-muted-foreground">
-                      {selectedImage.name}
-                    </span>
-                    <Input
-                      placeholder="Image caption (optional)"
-                      value={imageCaption}
-                      onChange={(e) => setImageCaption(e.target.value)}
-                      className="w-48"
-                    />
-                    <Button onClick={handleProcessImage} disabled={isProcessing}>
-                      Process
-                    </Button>
+          <TabsContent value="conversation" className="space-y-6">
+            {/* Enhanced Process Card */}
+            <Card className="border-0 shadow-xl bg-gradient-to-br from-white to-blue-50/30 dark:from-slate-800 dark:to-slate-700">
+              <CardHeader className="bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-t-lg">
+                <CardTitle className="flex items-center space-x-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/20">
+                    <MessageSquare className="h-5 w-5" />
                   </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
+                  <span>Process New Information</span>
+                </CardTitle>
+                <CardDescription className="text-blue-100">
+                  Share information with your AI companion to build your memory (Demo)
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="p-6 space-y-4">
+                <div className="flex space-x-3">
+                  <Input
+                    placeholder="Type your message here..."
+                    value={inputText}
+                    onChange={(e) => setInputText(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && handleProcessText()}
+                    disabled={isProcessing}
+                    className="flex-1 border-2 focus:border-blue-500"
+                  />
+                  <Button 
+                    onClick={handleProcessText} 
+                    disabled={isProcessing || !inputText.trim()}
+                    className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                  >
+                    {isProcessing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                    <span className="ml-2">Process</span>
+                  </Button>
+                </div>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Conversation History</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ScrollArea className="h-96">
-                <div className="space-y-4">
-                  {conversationHistory.map((entry) => (
-                    <div key={entry.id} className="flex space-x-3">
-                      <Avatar>
-                        <AvatarFallback>
-                          {entry.type === 'user' ? 'U' : 'AI'}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="flex-1 space-y-2">
-                        <div className="flex items-center space-x-2">
-                          <span className="font-medium">
-                            {entry.type === 'user' ? 'You' : 'AI Assistant'}
-                          </span>
-                          <span className="text-sm text-muted-foreground">
-                            {format(entry.timestamp, 'HH:mm')}
-                          </span>
-                          {entry.analysis && (
-                            <Badge className={getImportanceColor(entry.analysis.importance_score)}>
-                              {Math.round(entry.analysis.importance_score * 100)}% Important
-                            </Badge>
-                          )}
-                        </div>
-                        <p className="text-sm">{entry.content}</p>
-                        {entry.analysis && (
-                          <div className="text-xs text-muted-foreground space-y-1">
-                            <div>Sentiment: {entry.analysis.sentiment}</div>
-                            <div>Topics: {entry.analysis.topics.join(', ')}</div>
-                            {entry.analysis.entities.length > 0 && (
-                              <div>Entities: {entry.analysis.entities.join(', ')}</div>
+                <div className="flex items-center space-x-4">
+                  <Button
+                    variant="outline"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={isProcessing}
+                    className="border-2 hover:border-blue-500"
+                  >
+                    <Image className="h-4 w-4 mr-2" />
+                    Upload Image
+                  </Button>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    className="hidden"
+                  />
+                  {selectedImage && (
+                    <div className="flex items-center space-x-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                      <span className="text-sm text-blue-700 dark:text-blue-300">
+                        {selectedImage.name}
+                      </span>
+                      <Input
+                        placeholder="Image caption (optional)"
+                        value={imageCaption}
+                        onChange={(e) => setImageCaption(e.target.value)}
+                        className="w-48 border-2 focus:border-blue-500"
+                      />
+                      <Button 
+                        onClick={handleProcessImage} 
+                        disabled={isProcessing}
+                        className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700"
+                      >
+                        Process
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Enhanced Conversation History */}
+            <Card className="border-0 shadow-xl bg-gradient-to-br from-white to-purple-50/30 dark:from-slate-800 dark:to-slate-700">
+              <CardHeader className="bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-t-lg">
+                <CardTitle className="flex items-center space-x-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/20">
+                    <History className="h-5 w-5" />
+                  </div>
+                  <span>Conversation History</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-6">
+                <ScrollArea className="h-96">
+                  <div className="space-y-4">
+                    {conversationHistory.map((entry) => (
+                      <div key={entry.id} className="flex space-x-4 p-4 rounded-xl bg-gradient-to-r from-slate-50 to-blue-50/50 dark:from-slate-700 dark:to-slate-600 border border-slate-200 dark:border-slate-600">
+                        <Avatar className="h-10 w-10">
+                          <AvatarFallback className={entry.type === 'user' ? 'bg-blue-100 text-blue-600' : 'bg-purple-100 text-purple-600'}>
+                            {entry.type === 'user' ? 'U' : 'AI'}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1 space-y-3">
+                          <div className="flex items-center space-x-3">
+                            <span className="font-semibold text-slate-900 dark:text-slate-100">
+                              {entry.type === 'user' ? 'You' : 'AI Assistant'}
+                            </span>
+                            <span className="text-sm text-slate-500 dark:text-slate-400">
+                              {format(entry.timestamp, 'HH:mm')}
+                            </span>
+                            {entry.analysis && (
+                              <Badge className={`${getImportanceColor(entry.analysis.importance_score)} text-white`}>
+                                {Math.round(entry.analysis.importance_score * 100)}% Important
+                              </Badge>
                             )}
                           </div>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </ScrollArea>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="memory" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Brain className="h-5 w-5" />
-                <span>Query Your Memory</span>
-              </CardTitle>
-              <CardDescription>
-                Ask questions about your stored memories and get AI-powered answers (Demo)
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex space-x-2">
-                <Input
-                  placeholder="Ask about your memories..."
-                  value={queryText}
-                  onChange={(e) => setQueryText(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && handleQueryMemory()}
-                  disabled={isProcessing}
-                />
-                <Button onClick={handleQueryMemory} disabled={isProcessing || !queryText.trim()}>
-                  {isProcessing ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Query'}
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="tasks" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Calendar className="h-5 w-5" />
-                <span>Create New Task</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <Input
-                  placeholder="Task summary"
-                  value={newTask.summary}
-                  onChange={(e) => setNewTask({ ...newTask, summary: e.target.value })}
-                />
-                <Input
-                  type="date"
-                  value={newTask.start_date}
-                  onChange={(e) => setNewTask({ ...newTask, start_date: e.target.value })}
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <Textarea
-                  placeholder="Task description (optional)"
-                  value={newTask.description}
-                  onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
-                />
-                <Input
-                  type="date"
-                  value={newTask.end_date}
-                  onChange={(e) => setNewTask({ ...newTask, end_date: e.target.value })}
-                />
-              </div>
-              <Button onClick={handleCreateTask} disabled={!newTask.summary || !newTask.start_date || !newTask.end_date || isProcessing}>
-                {isProcessing ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-                Create Task
-              </Button>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Your Tasks</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {tasks.map((task) => (
-                  <div key={task.task_id} className="flex items-center justify-between p-3 border rounded-lg">
-                    <div className="flex items-center space-x-3">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleCompleteTask(task.task_id)}
-                        disabled={task.completed || isProcessing}
-                      >
-                        {task.completed ? (
-                          <CheckCircle className="h-4 w-4 text-green-600" />
-                        ) : (
-                          <Circle className="h-4 w-4" />
-                        )}
-                      </Button>
-                      <div>
-                        <p className={`font-medium ${task.completed ? 'line-through text-muted-foreground' : ''}`}>
-                          {task.summary}
-                        </p>
-                        {task.description && (
-                          <p className="text-sm text-muted-foreground">{task.description}</p>
-                        )}
-                        <div className="flex items-center space-x-2 text-xs text-muted-foreground">
-                          <Clock className="h-3 w-3" />
-                          <span>{task.start_date} - {task.end_date}</span>
+                          <p className="text-slate-700 dark:text-slate-300">{entry.content}</p>
+                          {entry.analysis && (
+                            <div className="text-xs text-slate-500 dark:text-slate-400 space-y-1 bg-slate-100 dark:bg-slate-800 p-3 rounded-lg">
+                              <div>Sentiment: <span className="font-medium">{entry.analysis.sentiment}</span></div>
+                              <div>Topics: <span className="font-medium">{entry.analysis.topics.join(', ')}</span></div>
+                              {entry.analysis.entities.length > 0 && (
+                                <div>Entities: <span className="font-medium">{entry.analysis.entities.join(', ')}</span></div>
+                              )}
+                            </div>
+                          )}
                         </div>
-                      </div>
-                    </div>
-                    <Badge variant={task.completed ? "secondary" : "default"}>
-                      {task.completed ? 'Completed' : 'Pending'}
-                    </Badge>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="analytics" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Memory Analytics</CardTitle>
-              <CardDescription>
-                Track your memory patterns and cognitive health (Demo Data)
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-6">
-                <div className="grid grid-cols-3 gap-4">
-                  <div className="text-center">
-                    <p className="text-2xl font-bold">{mockMemoryReport.total_interactions}</p>
-                    <p className="text-sm text-muted-foreground">Total Interactions</p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-2xl font-bold">
-                      {Math.round(mockMemoryReport.average_importance * 100)}%
-                    </p>
-                    <p className="text-sm text-muted-foreground">Avg Importance</p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-2xl font-bold">{mockMemoryReport.days}</p>
-                    <p className="text-sm text-muted-foreground">Days Tracked</p>
-                  </div>
-                </div>
-                
-                <Separator />
-                
-                <div>
-                  <h4 className="font-medium mb-2">Memory Trends</h4>
-                  <div className="space-y-2">
-                    {mockMemoryReport.memory_trends.map((trend, index) => (
-                      <div key={index} className="flex items-center justify-between">
-                        <span className="text-sm">{trend.date}</span>
-                        <Progress value={trend.score * 100} className="w-32" />
                       </div>
                     ))}
                   </div>
+                </ScrollArea>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="memory" className="space-y-6">
+            <Card className="border-0 shadow-xl bg-gradient-to-br from-white to-indigo-50/30 dark:from-slate-800 dark:to-slate-700">
+              <CardHeader className="bg-gradient-to-r from-indigo-600 to-blue-600 text-white rounded-t-lg">
+                <CardTitle className="flex items-center space-x-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/20">
+                    <Brain className="h-5 w-5" />
+                  </div>
+                  <span>Query Your Memory</span>
+                </CardTitle>
+                <CardDescription className="text-indigo-100">
+                  Ask questions about your stored memories and get AI-powered answers (Demo)
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="p-6 space-y-4">
+                <div className="flex space-x-3">
+                  <Input
+                    placeholder="Ask about your memories..."
+                    value={queryText}
+                    onChange={(e) => setQueryText(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && handleQueryMemory()}
+                    disabled={isProcessing}
+                    className="flex-1 border-2 focus:border-indigo-500"
+                  />
+                  <Button 
+                    onClick={handleQueryMemory} 
+                    disabled={isProcessing || !queryText.trim()}
+                    className="bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700"
+                  >
+                    {isProcessing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
+                    <span className="ml-2">Query</span>
+                  </Button>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="tasks" className="space-y-6">
+            <Card className="border-0 shadow-xl bg-gradient-to-br from-white to-green-50/30 dark:from-slate-800 dark:to-slate-700">
+              <CardHeader className="bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-t-lg">
+                <CardTitle className="flex items-center space-x-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/20">
+                    <Calendar className="h-5 w-5" />
+                  </div>
+                  <span>Create New Task</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-6 space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <Input
+                    placeholder="Task summary"
+                    value={newTask.summary}
+                    onChange={(e) => setNewTask({ ...newTask, summary: e.target.value })}
+                    className="border-2 focus:border-green-500"
+                  />
+                  <Input
+                    type="date"
+                    value={newTask.start_date}
+                    onChange={(e) => setNewTask({ ...newTask, start_date: e.target.value })}
+                    className="border-2 focus:border-green-500"
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <Textarea
+                    placeholder="Task description (optional)"
+                    value={newTask.description}
+                    onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
+                    className="border-2 focus:border-green-500"
+                  />
+                  <Input
+                    type="date"
+                    value={newTask.end_date}
+                    onChange={(e) => setNewTask({ ...newTask, end_date: e.target.value })}
+                    className="border-2 focus:border-green-500"
+                  />
+                </div>
+                <Button 
+                  onClick={handleCreateTask} 
+                  disabled={!newTask.summary || !newTask.start_date || !newTask.end_date || isProcessing}
+                  className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700"
+                >
+                  {isProcessing ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Plus className="h-4 w-4 mr-2" />}
+                  Create Task
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card className="border-0 shadow-xl bg-gradient-to-br from-white to-orange-50/30 dark:from-slate-800 dark:to-slate-700">
+              <CardHeader className="bg-gradient-to-r from-orange-600 to-red-600 text-white rounded-t-lg">
+                <CardTitle className="flex items-center space-x-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/20">
+                    <CheckCircle className="h-5 w-5" />
+                  </div>
+                  <span>Your Tasks</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-6">
+                <div className="space-y-3">
+                  {tasks.map((task) => (
+                    <div key={task.task_id} className="flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-slate-50 to-orange-50/50 dark:from-slate-700 dark:to-slate-600 border border-slate-200 dark:border-slate-600">
+                      <div className="flex items-center space-x-4">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleCompleteTask(task.task_id)}
+                          disabled={task.completed || isProcessing}
+                          className="hover:bg-green-100 dark:hover:bg-green-900/20"
+                        >
+                          {task.completed ? (
+                            <CheckCircle className="h-5 w-5 text-green-600" />
+                          ) : (
+                            <Circle className="h-5 w-5" />
+                          )}
+                        </Button>
+                        <div>
+                          <p className={`font-semibold ${task.completed ? 'line-through text-slate-400' : 'text-slate-900 dark:text-slate-100'}`}>
+                            {task.summary}
+                          </p>
+                          {task.description && (
+                            <p className="text-sm text-slate-600 dark:text-slate-400">{task.description}</p>
+                          )}
+                          <div className="flex items-center space-x-2 text-xs text-slate-500 dark:text-slate-400 mt-1">
+                            <Clock className="h-3 w-3" />
+                            <span>{task.start_date} - {task.end_date}</span>
+                          </div>
+                        </div>
+                      </div>
+                      <Badge variant={task.completed ? "secondary" : "default"} className={task.completed ? "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400" : "bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-400"}>
+                        {task.completed ? 'Completed' : 'Pending'}
+                      </Badge>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="analytics" className="space-y-6">
+            <Card className="border-0 shadow-xl bg-gradient-to-br from-white to-purple-50/30 dark:from-slate-800 dark:to-slate-700">
+              <CardHeader className="bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-t-lg">
+                <CardTitle className="flex items-center space-x-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/20">
+                    <BarChart3 className="h-5 w-5" />
+                  </div>
+                  <span>Memory Analytics</span>
+                </CardTitle>
+                <CardDescription className="text-purple-100">
+                  Track your memory patterns and cognitive health (Demo Data)
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="p-6">
+                <div className="space-y-6">
+                  <div className="grid grid-cols-3 gap-6">
+                    <div className="text-center p-4 rounded-xl bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20">
+                      <p className="text-3xl font-bold text-blue-600 dark:text-blue-400">{mockMemoryReport.total_interactions}</p>
+                      <p className="text-sm text-blue-700 dark:text-blue-300">Total Interactions</p>
+                    </div>
+                    <div className="text-center p-4 rounded-xl bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20">
+                      <p className="text-3xl font-bold text-green-600 dark:text-green-400">
+                        {Math.round(mockMemoryReport.average_importance * 100)}%
+                      </p>
+                      <p className="text-sm text-green-700 dark:text-green-300">Avg Importance</p>
+                    </div>
+                    <div className="text-center p-4 rounded-xl bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20">
+                      <p className="text-3xl font-bold text-purple-600 dark:text-purple-400">{mockMemoryReport.days}</p>
+                      <p className="text-sm text-purple-700 dark:text-purple-300">Days Tracked</p>
+                    </div>
+                  </div>
+                  
+                  <Separator className="bg-gradient-to-r from-transparent via-slate-300 to-transparent dark:via-slate-600" />
+                  
+                  <div>
+                    <h4 className="font-semibold mb-4 text-slate-900 dark:text-slate-100">Memory Trends</h4>
+                    <div className="space-y-3">
+                      {mockMemoryReport.memory_trends.map((trend, index) => (
+                        <div key={index} className="flex items-center justify-between p-3 rounded-lg bg-slate-50 dark:bg-slate-800">
+                          <span className="text-sm font-medium text-slate-700 dark:text-slate-300">{trend.date}</span>
+                          <div className="flex items-center space-x-3">
+                            <Progress value={trend.score * 100} className="w-32" />
+                            <span className="text-sm font-medium text-slate-600 dark:text-slate-400">
+                              {Math.round(trend.score * 100)}%
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </div>
     </div>
   );
 } 
