@@ -14,7 +14,9 @@ import { NotificationProvider } from "@/contexts/NotificationContext";
 import { InfiniteMemoryDashboard } from "@/components/infinite-memory/InfiniteMemoryDashboard";
 import { InfiniteMemoryDemo } from "@/components/infinite-memory/InfiniteMemoryDemo";
 import { MLPredictionsDashboard } from "@/components/ml-predictions/MLPredictionsDashboard";
+import { EnhancedMLPredictionsDashboard } from "@/components/ml-predictions/EnhancedMLPredictionsDashboard";
 import { MedicineRecommendationDashboard } from "@/components/medicine-recommendation/MedicineRecommendationDashboard";
+import { EnhancedMedicineAIDashboard } from "@/components/medicine-recommendation/EnhancedMedicineAIDashboard";
 import InventoryDashboard from "@/components/inventory/InventoryDashboard";
 import RFIDDashboard from "@/components/rfid/RFIDDashboard";
 import { Notifications } from "@/components/ui/notifications";
@@ -44,8 +46,10 @@ const AppContent = () => {
         <Route path="/supplier" element={<SupplierDashboard />} />
         <Route path="/infinite-memory" element={<InfiniteMemoryDashboard />} />
         <Route path="/infinite-memory-demo" element={<InfiniteMemoryDemo />} />
-        <Route path="/ml-predictions" element={<MLPredictionsDashboard />} />
-        <Route path="/medicine-recommendation" element={<MedicineRecommendationDashboard />} />
+        <Route path="/ml-predictions" element={<EnhancedMLPredictionsDashboard />} />
+        <Route path="/enhanced-ml-predictions" element={<EnhancedMLPredictionsDashboard />} />
+        <Route path="/medicine-recommendation" element={<EnhancedMedicineAIDashboard />} />
+        <Route path="/enhanced-medicine-ai" element={<EnhancedMedicineAIDashboard />} />
         <Route path="/inventory" element={<InventoryDashboard />} />
         <Route path="/rfid" element={<RFIDDashboard />} />
         <Route path="/profile" element={<Profile />} />

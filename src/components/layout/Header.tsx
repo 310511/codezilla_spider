@@ -54,7 +54,7 @@ export const Header = () => {
           <Link to="/medicine-recommendation">
             <Button variant="outline" className="font-semibold">
               <Pill className="h-4 w-4 mr-2" />
-              Medicine AI
+              Enhanced Medicine AI
             </Button>
           </Link>
 
