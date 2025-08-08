@@ -1,0 +1,35 @@
+{
+  "name": "cims-rfid-assignment",
+  "version": "1.0.0",
+  "description": "RFID Tag Assignment System for Clinic Inventory Management System",
+  "main": "assign_rfids.js",
+  "scripts": {
+    "start": "node assign_rfids.js",
+    "dry-run": "node assign_rfids.js --dry-run",
+    "statistics": "node assign_rfids.js --statistics",
+    "validate": "node assign_rfids.js --validate",
+    "export-report": "node assign_rfids.js --export-report",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "rfid",
+    "inventory",
+    "medical",
+    "healthcare",
+    "mongodb",
+    "mongoose"
+  ],
+  "author": "CIMS Team",
+  "license": "MIT",
+  "dependencies": {
+    "mongoose": "^7.6.3",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
+

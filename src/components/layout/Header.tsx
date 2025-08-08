@@ -1,4 +1,4 @@
-import { Bell, Shield, User, Brain, TrendingUp, Pill, Package } from "lucide-react";
+import { Bell, Shield, User, Brain, TrendingUp, Pill, Package, Radio } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { useNotifications } from "@/contexts/NotificationContext";
@@ -62,6 +62,13 @@ export const Header = () => {
             <Button variant="outline" className="font-semibold">
               <Package className="h-4 w-4 mr-2" />
               Inventory
+            </Button>
+          </Link>
+
+          <Link to="/rfid">
+            <Button variant="outline" className="font-semibold">
+              <Radio className="h-4 w-4 mr-2" />
+              RFID
             </Button>
           </Link>
           
