@@ -73,6 +73,30 @@ graph TB
     I --> M[NLP/Recommendations]
     J --> N[Data Storage]
 ```
+##💡 How to Run Locally
+```
+bash
+Copy
+Edit
+# Clone repo
+git clone https://github.com/your-username/medchain.git
+
+# Install dependencies
+cd medchain
+npm install
+
+# Start blockchain (Ganache)
+ganache-cli
+
+# Deploy smart contracts
+truffle migrate --reset
+
+# Run backend
+npm run server
+
+# Run frontend
+npm run start
+```
 
 ## ✨ Key Features
 
