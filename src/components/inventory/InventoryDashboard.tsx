@@ -6,6 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Progress } from "@/components/ui/progress";
+import { API_ENDPOINTS } from "@/config/api";
 import { 
   Package, 
   AlertTriangle, 
@@ -108,10 +109,10 @@ const InventoryDashboard: React.FC = () => {
       
       // Fetch all data in parallel
       const [suppliesRes, alertsRes, ordersRes, suppliersRes] = await Promise.all([
-        fetch("http://localhost:8000/inventory/supplies"),
-        fetch("http://localhost:8000/inventory/alerts"),
-        fetch("http://localhost:8000/inventory/purchase-orders"),
-        fetch("http://localhost:8000/inventory/suppliers")
+        fetch(API_ENDPOINTS.INVENTORY_SUPPLIES),
+        fetch(API_ENDPOINTS.INVENTORY_ALERTS),
+        fetch(API_ENDPOINTS.INVENTORY_PURCHASE_ORDERS),
+        fetch(API_ENDPOINTS.INVENTORY_SUPPLIERS)
       ]);
 
       if (suppliesRes.ok) {
@@ -142,7 +143,7 @@ const InventoryDashboard: React.FC = () => {
 
   const runAlertCheck = async () => {
     try {
-      const response = await fetch("http://localhost:8000/inventory/alerts/check", {
+      const response = await fetch(API_ENDPOINTS.INVENTORY_ALERTS_CHECK, {
         method: "POST"
       });
       
@@ -156,7 +157,7 @@ const InventoryDashboard: React.FC = () => {
 
   const autoGenerateOrders = async () => {
     try {
-      const response = await fetch("http://localhost:8000/inventory/purchase-orders/auto-generate", {
+      const response = await fetch(API_ENDPOINTS.INVENTORY_PURCHASE_ORDERS_AUTO_GENERATE, {
         method: "POST"
       });
       
@@ -170,7 +171,7 @@ const InventoryDashboard: React.FC = () => {
 
   const dismissAlert = async (alertId: string) => {
     try {
-      const response = await fetch("http://localhost:8000/inventory/alerts/dismiss", {
+      const response = await fetch(API_ENDPOINTS.INVENTORY_ALERTS_DISMISS, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"

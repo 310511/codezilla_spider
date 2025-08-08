@@ -86,7 +86,7 @@ interface MedicineRecommendationResponse {
   total_restocking_requests: number;
 }
 
-const BACKEND_URL = "http://localhost:8000";
+  const BACKEND_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
 export function EnhancedMedicineAIDashboard() {
   const [symptoms, setSymptoms] = useState('');

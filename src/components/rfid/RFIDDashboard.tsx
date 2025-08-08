@@ -6,6 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Progress } from "@/components/ui/progress";
+import { API_ENDPOINTS } from "@/config/api";
 import { 
   Radio, 
   Plus, 
@@ -94,8 +95,8 @@ const RFIDDashboard: React.FC = () => {
       
       // Fetch RFID tags and supplies data
       const [rfidRes, suppliesRes] = await Promise.all([
-        fetch("http://localhost:8000/rfid/tags"),
-        fetch("http://localhost:8000/inventory/supplies")
+        fetch(API_ENDPOINTS.RFID_TAGS),
+        fetch(API_ENDPOINTS.INVENTORY_SUPPLIES)
       ]);
 
       if (rfidRes.ok) {
@@ -118,7 +119,7 @@ const RFIDDashboard: React.FC = () => {
     try {
       setIsAssigning(true);
       setAssignmentMessage("");
-      const response = await fetch("http://localhost:8000/rfid/assign", {
+      const response = await fetch(API_ENDPOINTS.RFID_ASSIGN, {
         method: "POST"
       });
       
@@ -154,7 +155,7 @@ const RFIDDashboard: React.FC = () => {
 
   const handleUpdateTag = async (updatedTag: RFIDTag) => {
     try {
-      const response = await fetch(`http://localhost:8000/rfid/tags/${updatedTag.tag_id}`, {
+              const response = await fetch(API_ENDPOINTS.RFID_TAG_UPDATE(updatedTag.tag_id), {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -238,7 +239,7 @@ const RFIDDashboard: React.FC = () => {
       
       switch (action) {
         case 'assign_all':
-          const response = await fetch("http://localhost:8000/rfid/assign", {
+          const response = await fetch(API_ENDPOINTS.RFID_ASSIGN, {
             method: "POST"
           });
           if (response.ok) {
@@ -251,7 +252,7 @@ const RFIDDashboard: React.FC = () => {
           break;
           
         case 'validate_all':
-          const validateResponse = await fetch("http://localhost:8000/rfid/validate", {
+          const validateResponse = await fetch(API_ENDPOINTS.RFID_VALIDATE, {
             method: "POST"
           });
           if (validateResponse.ok) {
@@ -295,7 +296,7 @@ const RFIDDashboard: React.FC = () => {
       setIsLoadingAnalytics(true);
       
       // Fetch analytics data from backend
-      const response = await fetch("http://localhost:8000/rfid/statistics");
+      const response = await fetch(API_ENDPOINTS.RFID_STATISTICS);
       
       if (response.ok) {
         const data = await response.json();
